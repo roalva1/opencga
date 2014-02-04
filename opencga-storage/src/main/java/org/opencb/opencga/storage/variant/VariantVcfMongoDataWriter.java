@@ -22,6 +22,10 @@ import java.util.logging.Logger;
  */
 public class VariantVcfMongoDataWriter implements VariantWriter {
 
+    private boolean includeStats;
+    private boolean includeEffect;
+    private boolean includeSamples;
+
     private VariantStudy study;
 
     private MongoClient mongoClient;
@@ -30,10 +34,6 @@ public class VariantVcfMongoDataWriter implements VariantWriter {
     private DBCollection variantCollection;
 
     private MongoCredentials credentials;
-
-    private boolean includeStats;
-    private boolean includeEffect;
-    private boolean includeSamples;
 
     public VariantVcfMongoDataWriter(VariantStudy study, String species, MongoCredentials credentials) {
         if (credentials == null) {

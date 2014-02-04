@@ -14,7 +14,7 @@ import org.opencb.commons.utils.OptionFactory;
 import org.opencb.opencga.lib.auth.*;
 import org.opencb.opencga.storage.variant.VariantVcfMonbaseDataWriter;
 import org.opencb.opencga.storage.variant.VariantVcfMongoDataWriter;
-import org.opencb.opencga.storage.variant.VariantVcfSqliteWriter;
+import org.opencb.opencga.storage.variant.VariantVcfNewSqliteWriter;
 import org.opencb.variant.lib.runners.VariantRunner;
 import org.opencb.variant.lib.runners.tasks.VariantEffectTask;
 import org.opencb.variant.lib.runners.tasks.VariantStatsTask;
@@ -142,7 +142,7 @@ public class OpenCGAMain {
 
         if (backend.equalsIgnoreCase("sqlite")) {
             credentials = new SqliteCredentials(properties);
-            writers.add(new VariantVcfSqliteWriter((SqliteCredentials) credentials));
+            writers.add(new VariantVcfNewSqliteWriter((SqliteCredentials) credentials));
         } else if (backend.equalsIgnoreCase("monbase")) {
             credentials = new MonbaseCredentials(properties);
             writers.add(new VariantVcfMonbaseDataWriter(study.getName(), "opencga-hsapiens", (MonbaseCredentials) credentials));

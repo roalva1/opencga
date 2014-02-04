@@ -29,7 +29,7 @@ public class VariantIndexRunnerTest extends GenericTest {
     public void sqliteIndex() throws IOException {
 
         VariantReader reader = new VariantVcfReader(inputFile);
-        VariantWriter writer = new VariantVcfSqliteWriter(outputFile);
+        VariantWriter writer = new VariantVcfNewSqliteWriter(outputFile);
 
 //        VariantIndexRunner runner = new VariantIndexRunner(study, reader, null, writer);
 
@@ -47,7 +47,7 @@ public class VariantIndexRunnerTest extends GenericTest {
         SqliteCredentials credentials = new SqliteCredentials(path);
 
         VariantReader reader = new VariantVcfReader(inputFile);
-        VariantWriter writer = new VariantVcfSqliteWriter(credentials);
+        VariantWriter writer = new VariantVcfNewSqliteWriter(credentials);
 
 //        VariantIndexRunner runner = new VariantIndexRunner(study, reader, null, writer);
 //
