@@ -178,7 +178,6 @@ public class VariantVcfNewSqliteWriter implements VariantWriter {
                         pstmtEffect = SqliteSingletonConnection.getConnection().prepareStatement(sqlEffect);
 
                         for (VariantEffect ve : v.getEffect()) {
-                            System.out.println(ve);
                             pstmtEffect.setInt(1, id);
                             pstmtEffect.setString(2, ve.getFeatureId());
                             pstmtEffect.setString(3, ve.getFeatureName());
@@ -464,7 +463,7 @@ public class VariantVcfNewSqliteWriter implements VariantWriter {
 
         String variantEffectTable = "CREATE TABLE IF NOT EXISTS variant_effect(" +
                 "id_variant_effect INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "  id_variant     INTEGER," +
+                "id_variant INTEGER," +
                 "feature_id TEXT, " +
                 "feature_name TEXT, " +
                 "feature_type TEXT, " +
@@ -490,8 +489,8 @@ public class VariantVcfNewSqliteWriter implements VariantWriter {
 //                "polyphen_effect INT," +
 //                "sift_score DOUBLE," +
 //                "sift_effect INT" +
-                "  FOREIGN KEY (id_variant) REFERENCES variant (id_variant)" +
-                "); ";
+                "FOREIGN KEY (id_variant) REFERENCES variant (id_variant)" +
+                ");";
 
         String variantTable = "CREATE TABLE IF NOT EXISTS variant (" +
                 "  id_variant INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -597,7 +596,7 @@ public class VariantVcfNewSqliteWriter implements VariantWriter {
             stmt.execute("CREATE INDEX IF NOT EXISTS sample_info_id_variant_idx ON sample_info (id_variant);");
             stmt.execute("CREATE INDEX IF NOT EXISTS variant_info_id_variant_idx ON variant_info (id_variant);");
             stmt.execute("CREATE INDEX IF NOT EXISTS variant_stats_id_variant_idx ON variant_stats (id_variant);");
-            stmt.execute("CREATE INDEX IF NOT EXISTS variant_effect_id_variant_idx ON variant_effect (id_effect);");
+            stmt.execute("CREATE INDEX IF NOT EXISTS variant_effect_id_variant_idx ON variant_effect (id_variant_effect);");
 
 //            stmt.execute("REINDEX variant_effect_chromosome_position_idx;");
 //            stmt.execute("REINDEX variant_effect_feature_biotype_idx;");

@@ -35,8 +35,7 @@ public class VariantVcfSqliteWriterTest extends GenericTest {
 
     private static String oldDBName = "/tmp/old.db";
     private static String newDBName = "/tmp/new.db";
-    //    private static String inputFile = VariantVcfSqliteWriterTest.class.getResource("/variant-test-file.vcf.gz").getFile();
-    private static String inputFile = "/home/aaleman/Documents/pruebas/index/aux.vcf";
+    private static String inputFile = VariantVcfSqliteWriterTest.class.getResource("/variant-test-file.vcf.gz").getFile();
 
     private static List<Task<Variant>> newTaskList;
     private static List<Task<Variant>> oldTaskList;
@@ -109,7 +108,7 @@ public class VariantVcfSqliteWriterTest extends GenericTest {
         super.setUp();
 
         sqmOld.connect(Paths.get(oldDBName), true);
-        sqmNew.connect(Paths.get(oldDBName), true);
+        sqmNew.connect(Paths.get(newDBName), true);
     }
 
     @Override
@@ -124,40 +123,35 @@ public class VariantVcfSqliteWriterTest extends GenericTest {
     @Test
     public void testSelectVariantOld() throws Exception {
 
-        List<XObject> res;
-        res = sqmOld.query("select * from variant;");
+        sqmOld.query("select * from variant;");
 
     }
 
     @Test
     public void testSelectVariantNew() throws Exception {
 
-        List<XObject> res;
-        res = sqmNew.query("select * from variant;");
+        sqmNew.query("select * from variant;");
 
     }
 
     @Test
     public void testSelectVariantStatsOld() throws Exception {
 
-        List<XObject> res;
-        res = sqmOld.query("SELECT * FROM variant_stats inner join variant on variant_stats.chromosome=variant.chromosome AND variant_stats.position=variant.position AND variant_stats.allele_ref=variant.ref AND variant_stats.allele_alt=variant.alt ;");
+        sqmOld.query("SELECT * FROM variant_stats inner join variant on variant_stats.chromosome=variant.chromosome AND variant_stats.position=variant.position AND variant_stats.allele_ref=variant.ref AND variant_stats.allele_alt=variant.alt ;");
 
     }
 
     @Test
     public void testSelectVariantStatsNew() throws Exception {
 
-        List<XObject> res;
-        res = sqmNew.query("SELECT * FROM variant inner join variant_stats on variant.id_variant=variant_stats.id_variant;");
+        sqmNew.query("SELECT * FROM variant inner join variant_stats on variant.id_variant=variant_stats.id_variant;");
 
     }
 
     @Test
     public void testSelectVariantStatsInfoOld() throws Exception {
 
-        List<XObject> res;
-        res = sqmOld.query("SELECT * FROM variant_stats " +
+        sqmOld.query("SELECT * FROM variant_stats " +
                 "inner join variant on variant_stats.chromosome=variant.chromosome AND variant_stats.position=variant.position AND " +
                 "variant_stats.allele_ref=variant.ref AND variant_stats.allele_alt=variant.alt " +
                 "left join variant_info on variant.id_variant=variant_info.id_variant " +
@@ -168,8 +162,7 @@ public class VariantVcfSqliteWriterTest extends GenericTest {
     @Test
     public void testSelectVariantStatsInfoNew() throws Exception {
 
-        List<XObject> res;
-        res = sqmNew.query("SELECT * FROM variant " +
+        sqmNew.query("SELECT * FROM variant " +
                 "inner join variant_stats on variant.id_variant=variant_stats.id_variant " +
                 "left join variant_info on variant.id_variant=variant_info.id_variant;");
 
@@ -178,22 +171,55 @@ public class VariantVcfSqliteWriterTest extends GenericTest {
     @Test
     public void testSelectVariantStatsInfoSamplesOld() throws Exception {
 
-        List<XObject> res;
-        res = sqmOld.query("SELECT * FROM variant_stats " +
-                "inner join variant on variant_stats.chromosome=variant.chromosome AND variant_stats.position=variant.position AND " +
-                "variant_stats.allele_ref=variant.ref AND variant_stats.allele_alt=variant.alt " +
+        sqmOld.query("SELECT * FROM variant_stats " +
+                "inner join variant on variant_stats.chromosome=variant.chromosome AND variant_stats.position=variant.position AND variant_stats.allele_ref=variant.ref AND variant_stats.allele_alt=variant.alt " +
                 "left join variant_info on variant.id_variant=variant_info.id_variant " +
-                ";");
+                "inner join sample_info on variant.id_variant=sample_info.id_variant;");
 
     }
 
     @Test
     public void testSelectVariantStatsInfoSamplesNew() throws Exception {
 
-        List<XObject> res;
-        res = sqmNew.query("SELECT * FROM variant " +
+        sqmNew.query("SELECT * FROM variant " +
                 "inner join variant_stats on variant.id_variant=variant_stats.id_variant " +
-                "left join variant_info on variant.id_variant=variant_info.id_variant;");
+                "left join variant_info on variant.id_variant=variant_info.id_variant " +
+                "inner join sample_info on variant.id_variant=sample_info.id_variant;");
+
+    }
+
+    @Test
+    public void testSelectVariantStatsInfoSamplesEffectOld() throws Exception {
+
+        sqmOld.query("SELECT distinct variant.id_variant, variant_info.key, variant_info.value, sample_info.sample_name, sample_info.allele_1, sample_info.allele_2, variant_stats.chromosome ,\n" +
+                "variant_stats.position , variant_stats.allele_ref , variant_stats.allele_alt , variant_stats.id , variant_stats.maf , variant_stats.mgf, \n" +
+                "variant_stats.allele_maf , variant_stats.genotype_maf , variant_stats.miss_allele , variant_stats.miss_gt , variant_stats.mendel_err ,\n" +
+                "variant_stats.is_indel , variant_stats.cases_percent_dominant , variant_stats.controls_percent_dominant , variant_stats.cases_percent_recessive , variant_stats.controls_percent_recessive, \n" +
+                "variant.polyphen_score, variant.polyphen_effect, variant.sift_score, variant.sift_effect, \n" +
+                "variant_effect.gene_name , variant_effect.consequence_type_obo " +
+                "FROM variant_stats \n" +
+                "inner join variant on variant_stats.chromosome=variant.chromosome AND variant_stats.position=variant.position AND variant_stats.allele_ref=variant.ref AND variant_stats.allele_alt=variant.alt \n" +
+                "inner join sample_info on variant.id_variant=sample_info.id_variant \n" +
+                "left join variant_info on variant.id_variant=variant_info.id_variant " +
+                "inner join variant_effect on variant_effect.chromosome=variant.chromosome AND variant_effect.position=variant.position AND variant_effect.reference_allele=variant.ref AND variant_effect.alternative_allele=variant.alt \n" +
+                ";");
+    }
+
+    @Test
+    public void testSelectVariantStatsInfoSamplesEffectNew() throws Exception {
+
+        sqmNew.query("SELECT distinct variant.chromosome, variant.position, variant.ref, variant.alt, \n" +
+                "\tvariant_stats.maf , variant_stats.mgf, variant_stats.allele_maf , variant_stats.genotype_maf , variant_stats.miss_allele , variant_stats.miss_gt , variant_stats.mendel_err , \n" +
+                "\tvariant_stats.is_indel , variant_stats.cases_percent_dominant , variant_stats.controls_percent_dominant , variant_stats.cases_percent_recessive , variant_stats.controls_percent_recessive,\n" +
+                "\tvariant_info.key, variant_info.value ,\n" +
+                "\tsample.sample_name, sample_info.allele_1, sample_info.allele_2,\n" +
+                "\tvariant_effect.gene_name, variant_effect.consequence_type_obo\t\n" +
+                "FROM variant \n" +
+                "inner join variant_stats on variant.id_variant=variant_stats.id_variant \n" +
+                "left join variant_info on variant.id_variant=variant_info.id_variant \n" +
+                "inner join sample_info on variant.id_variant=sample_info.id_variant \n" +
+                "inner join  sample on sample_info.id_sample=sample.id_sample\n" +
+                "inner join variant_effect on variant.id_variant=variant_effect.id_variant ;");
 
     }
 
