@@ -342,15 +342,7 @@ public class AccountMongoDBManager implements AccountManager {
             throw new AccountManagementException("could not reset the password");
         }
 
-        StringBuilder message = new StringBuilder();
-        message.append("Hello,").append("\n");
-        message.append("You can now login using this new password:").append("\n\n");
-        message.append(newPassword).append("\n\n\n");
-        message.append("Please change it when you first login.").append("\n\n");
-        message.append("Best regards,").append("\n\n");
-        message.append("Computational Biology Unit at Computational Medicine Institute").append("\n");
-
-        MailUtils.sendResetPasswordMail(email, message.toString());
+        MailUtils.sendResetPasswordMail(email, newPassword);
 
         return result;
     }
