@@ -7,7 +7,6 @@ import org.apache.hadoop.hbase.MasterNotRunningException;
 import org.apache.hadoop.hbase.ZooKeeperConnectionException;
 import org.opencb.commons.bioformats.variant.json.VariantAnalysisInfo;
 import org.opencb.commons.bioformats.variant.json.VariantInfo;
-import org.opencb.commons.bioformats.variant.utils.effect.VariantEffect;
 import org.opencb.commons.bioformats.variant.utils.stats.VariantStats;
 import org.opencb.commons.containers.QueryResult;
 import org.opencb.opencga.account.beans.Job;
@@ -25,7 +24,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 @Path("/account/{accountId}/analysis/job/{jobId}")
 public class JobAnalysisWSServer extends GenericWSServer {
@@ -164,39 +166,14 @@ public class JobAnalysisWSServer extends GenericWSServer {
 
     // TODO Find place for this webservices
     //VARIANT EXPLORER WS
-    @POST
-    @Path("/variants")
-    @Consumes("application/x-www-form-urlencoded")
-    public Response getVariantInfo(@DefaultValue("") @QueryParam("filename") String filename, MultivaluedMap<String, String> postParams) {
-        Map<String, String> map = new LinkedHashMap<>();
-
-        for (Map.Entry<String, List<String>> entry : postParams.entrySet()) {
-            map.put(entry.getKey(), Joiner.on(",").join(entry.getValue()));
-//            map.put(entry.getKey(), StringUtils.join(entry.getValue(), ","));
-        }
-
-        System.out.println(map);
-
-        java.nio.file.Path dataPath = cloudSessionManager.getJobFolderPath(accountId, projectId, Paths.get(this.jobId)).resolve(filename);
-
-        System.out.println("dataPath = " + dataPath.toString());
-
-        map.put("db_name", dataPath.toString());
-        VariantQueryBuilder vqm = new VariantSqliteQueryBuilder();
-        List<VariantInfo> list = vqm.getRecords(map);
 
 
-        String res = null;
-        try {
-            res = jsonObjectMapper.writeValueAsString(list);
-
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return createOkResponse(res);
+    @OPTIONS
+    @Path("/variantsMongo")
+    public Response getVariantsMongoOpt() {
+        return createOkResponse("");
     }
 
-    //    @Consumes("application/x-www-form-urlencoded")
     @GET
     @Path("/variantsMongo")
     public Response getVariantsMongo() {
@@ -244,60 +221,13 @@ public class JobAnalysisWSServer extends GenericWSServer {
         return createOkResponse(queryResult);
     }
 
-    @POST
-    @Path("/variant_effects")
-    @Consumes("application/x-www-form-urlencoded")
-    public Response getVariantEffects(@DefaultValue("") @QueryParam("filename") String filename, MultivaluedMap<String, String> postParams) {
-        Map<String, String> map = new LinkedHashMap<>();
 
-        for (Map.Entry<String, List<String>> entry : postParams.entrySet()) {
-            map.put(entry.getKey(), Joiner.on(",").join(entry.getValue()));
-        }
-
-        System.out.println(map);
-
-        java.nio.file.Path dataPath = cloudSessionManager.getJobFolderPath(accountId, projectId, Paths.get(this.jobId)).resolve(filename);
-
-        System.out.println("dataPath = " + dataPath.toString());
-
-        map.put("db_name", dataPath.toString());
-        VariantQueryBuilder vqm = new VariantSqliteQueryBuilder();
-        List<VariantEffect> list = vqm.getEffect(map);
-
-
-        String res = null;
-        try {
-            res = jsonObjectMapper.writeValueAsString(list);
-
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return createOkResponse(res);
+    @OPTIONS
+    @Path("/variantInfoMongo")
+    public Response getAnalysisInfoMongoOpt() {
+        return createOkResponse("");
     }
 
-    @GET
-    @Path("/variant_info")
-    public Response getAnalysisInfo(@DefaultValue("") @QueryParam("filename") String filename) {
-
-        Map<String, String> map = new LinkedHashMap<>();
-
-        java.nio.file.Path dataPath = cloudSessionManager.getJobFolderPath(accountId, projectId, Paths.get(this.jobId)).resolve(filename);
-        map.put("db_name", dataPath.toString());
-
-        VariantQueryBuilder vqm = new VariantSqliteQueryBuilder();
-        VariantAnalysisInfo vi = vqm.getAnalysisInfo(map);
-
-
-        String res = null;
-        try {
-            res = jsonObjectMapper.writeValueAsString(vi);
-
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
-        return createOkResponse(res);
-    }
 
     @GET
     @Path("/variantInfoMongo")
