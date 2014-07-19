@@ -194,8 +194,8 @@ public class VariantMongoQueryBuilder implements VariantQueryBuilder {
 
         System.out.println("map = " + options);
 
-        if (options.containsKey("region_list") && !options.get("region_list").equals("")) {
-            String[] regions = options.get("region_list").split(",");
+        if (options.containsKey("region") && !options.get("region").equals("")) {
+            String[] regions = options.get("region").split(",");
             Pattern pattern = Pattern.compile("(\\w+):(\\d+)-(\\d+)");
             Matcher matcher, matcherChr;
 
@@ -289,6 +289,22 @@ public class VariantMongoQueryBuilder implements VariantQueryBuilder {
             andControls.add(new BasicDBObject("$or", or));
         }
 
+        if (options.containsKey("maf_1000g_eur_controls") && !options.get("maf_1000g_eur_controls").equalsIgnoreCase("")) {
+            System.out.print("EUR");
+            BasicDBList or = new BasicDBList();
+            or.add(new BasicDBObject("attributes.1000G_EUR_maf", new BasicDBObject("$exists", false)));
+            or.add(new BasicDBObject("attributes.1000G_EUR_maf", new BasicDBObject("$lte", options.get("maf_1000g_eur_controls"))));
+
+            andControls.add(new BasicDBObject("$or", or));
+        }
+        if (options.containsKey("maf_1000g_ame_controls") && !options.get("maf_1000g_ame_controls").equalsIgnoreCase("")) {
+            System.out.print("AME");
+            BasicDBList or = new BasicDBList();
+            or.add(new BasicDBObject("attributes.1000G_AME_maf", new BasicDBObject("$exists", false)));
+            or.add(new BasicDBObject("attributes.1000G_AME_maf", new BasicDBObject("$lte", options.get("maf_1000g_ame_controls"))));
+
+            andControls.add(new BasicDBObject("$or", or));
+        }
         if (options.containsKey("maf_evs_controls") && !options.get("maf_evs_controls").equalsIgnoreCase("")) {
             BasicDBList or = new BasicDBList();
             or.add(new BasicDBObject("attributes.EVS_maf", new BasicDBObject("$exists", false)));

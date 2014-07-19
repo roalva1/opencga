@@ -84,6 +84,19 @@ public class AccountMongoDBManager implements AccountManager {
     }
 
     @Override
+    public boolean checkAccount(String accountId, String sessionId) {
+        BasicDBObject query = new BasicDBObject("accountId", accountId);
+        query.put("sessions.id", sessionId);
+
+        DBObject obj = userCollection.findOne(query);
+        if (obj == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    @Override
     public QueryResult<ObjectMap> createAccount(String accountId, String password, String accountName, String role, String email,
                                                 Session session) throws AccountManagementException, JsonProcessingException {
         ObjectMap resultObjectMap = new ObjectMap();
@@ -103,6 +116,7 @@ public class AccountMongoDBManager implements AccountManager {
         result.setNumResults(1);
         return result;
     }
+
     @Override
     public QueryResult<ObjectMap> deleteAccount(String accountId) throws AccountManagementException, JsonProcessingException {
         ObjectMap resultObjectMap = new ObjectMap();
@@ -636,7 +650,7 @@ public class AccountMongoDBManager implements AccountManager {
 
         if (aggregationOutput != null) {
             Iterator<DBObject> it = aggregationOutput.results().iterator();
-            if(it.hasNext()){
+            if (it.hasNext()) {
                 DBObject next = it.next();
                 ObjectItem objectItem = jsonObjectMapper.readValue(next.get("object").toString(), ObjectItem.class);
                 return objectItem;

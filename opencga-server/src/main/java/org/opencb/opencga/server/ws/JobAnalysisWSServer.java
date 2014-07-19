@@ -181,44 +181,50 @@ public class JobAnalysisWSServer extends GenericWSServer {
 
         UriInfo info = uriInfo;
 
-        MultivaluedMap<String, String> queryParams = info.getQueryParameters();
-        for (Map.Entry<String, List<String>> entry : queryParams.entrySet()) {
-            map.put(entry.getKey(), Joiner.on(",").join(entry.getValue()));
-        }
+        if (cloudSessionManager.checkAccount(accountId, sessionId)) {
 
 
-        int page = (info.getQueryParameters().containsKey("page")) ? Integer.parseInt(info.getQueryParameters().getFirst("page")) : 1;
-        int start = (info.getQueryParameters().containsKey("start")) ? Integer.parseInt(info.getQueryParameters().getFirst("start")) : 0;
-        int limit = (info.getQueryParameters().containsKey("limit")) ? Integer.parseInt(info.getQueryParameters().getFirst("limit")) : 25;
+            MultivaluedMap<String, String> queryParams = info.getQueryParameters();
+            for (Map.Entry<String, List<String>> entry : queryParams.entrySet()) {
+                map.put(entry.getKey(), Joiner.on(",").join(entry.getValue()));
+            }
+
+
+            int page = (info.getQueryParameters().containsKey("page")) ? Integer.parseInt(info.getQueryParameters().getFirst("page")) : 1;
+            int start = (info.getQueryParameters().containsKey("start")) ? Integer.parseInt(info.getQueryParameters().getFirst("start")) : 0;
+            int limit = (info.getQueryParameters().containsKey("limit")) ? Integer.parseInt(info.getQueryParameters().getFirst("limit")) : 25;
 //        String callback = (info.getQueryParameters().containsKey("callback")) ? info.getQueryParameters().getFirst("callback") : "null";
 
-        map.put("studyId", accountId + "_-_" + this.jobId);
+            map.put("studyId", accountId + "_-_" + this.jobId);
 
-        System.out.println(map);
-        MutableInt count = new MutableInt(-1);
+            System.out.println(map);
+            MutableInt count = new MutableInt(-1);
 
-        Properties prop = new Properties();
-        prop.put("mongo_host", "mem15");
-        prop.put("mongo_port", 27017);
-        prop.put("mongo_db_name", "cibererStudies");
-        prop.put("mongo_user", "user");
-        prop.put("mongo_password", "pass");
+            Properties prop = new Properties();
+            prop.put("mongo_host", "mem15");
+            prop.put("mongo_port", 27017);
+            prop.put("mongo_db_name", "cibererStudies");
+            prop.put("mongo_user", "user");
+            prop.put("mongo_password", "pass");
 
-        MongoCredentials credentials = new MongoCredentials(prop);
-        VariantQueryBuilder vqm;
-        String res = null;
-        QueryResult<VariantInfo> queryResult = null;
-        try {
-            vqm = new VariantMongoQueryBuilder(credentials);
-            queryResult = ((VariantMongoQueryBuilder) vqm).getRecordsMongo(page, start, limit, count, map);
+            MongoCredentials credentials = new MongoCredentials(prop);
+            VariantQueryBuilder vqm;
+            String res = null;
+            QueryResult<VariantInfo> queryResult = null;
+            try {
+                vqm = new VariantMongoQueryBuilder(credentials);
+                queryResult = ((VariantMongoQueryBuilder) vqm).getRecordsMongo(page, start, limit, count, map);
 
-            queryResult.setNumResults(count.intValue());
-            vqm.close();
+                queryResult.setNumResults(count.intValue());
+                vqm.close();
 
-        } catch (MasterNotRunningException | ZooKeeperConnectionException | UnknownHostException e) {
-            e.printStackTrace();
+            } catch (MasterNotRunningException | ZooKeeperConnectionException | UnknownHostException e) {
+                e.printStackTrace();
+            }
+            return createOkResponse(queryResult);
+        } else {
+            return createErrorResponse("User Not allowed!!");
         }
-        return createOkResponse(queryResult);
     }
 
 
@@ -235,34 +241,40 @@ public class JobAnalysisWSServer extends GenericWSServer {
 
         String studyId = (accountId + "_-_" + this.jobId);
 
-        Properties prop = new Properties();
-        prop.put("mongo_host", "mem15");
-        prop.put("mongo_port", 27017);
-        prop.put("mongo_db_name", "cibererStudies");
-        prop.put("mongo_user", "user");
-        prop.put("mongo_password", "pass");
+        if (cloudSessionManager.checkAccount(accountId, sessionId)) {
 
-        MongoCredentials credentials = new MongoCredentials(prop);
-        VariantQueryBuilder vqm;
-        String res = null;
-        QueryResult<VariantAnalysisInfo> queryResult = null;
-        try {
-            vqm = new VariantMongoQueryBuilder(credentials);
 
-            queryResult = ((VariantMongoQueryBuilder) vqm).getAnalysisInfo(studyId);
+            Properties prop = new Properties();
+            prop.put("mongo_host", "mem15");
+            prop.put("mongo_port", 27017);
+            prop.put("mongo_db_name", "cibererStudies");
+            prop.put("mongo_user", "user");
+            prop.put("mongo_password", "pass");
 
-            res = jsonObjectMapper.writeValueAsString(queryResult);
+            MongoCredentials credentials = new MongoCredentials(prop);
+            VariantQueryBuilder vqm;
+            String res = null;
+            QueryResult<VariantAnalysisInfo> queryResult = null;
+            try {
+                vqm = new VariantMongoQueryBuilder(credentials);
 
-            vqm.close();
+                queryResult = ((VariantMongoQueryBuilder) vqm).getAnalysisInfo(studyId);
 
-        } catch (MasterNotRunningException | ZooKeeperConnectionException | UnknownHostException e) {
-            e.printStackTrace();
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+                res = jsonObjectMapper.writeValueAsString(queryResult);
+
+                vqm.close();
+
+            } catch (MasterNotRunningException | ZooKeeperConnectionException | UnknownHostException e) {
+                e.printStackTrace();
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+
+
+            return createOkResponse(queryResult);
+        } else {
+            return createErrorResponse("User not Allowed!!");
         }
-
-
-        return createOkResponse(queryResult);
 
 
     }

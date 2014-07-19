@@ -3,7 +3,10 @@ package org.opencb.opencga.account;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import org.opencb.commons.bioformats.feature.Region;
+import org.opencb.commons.containers.QueryResult;
 import org.opencb.commons.containers.map.ObjectMap;
+import org.opencb.commons.containers.map.QueryOptions;
 import org.opencb.opencga.account.beans.*;
 import org.opencb.opencga.account.db.AccountFileManager;
 import org.opencb.opencga.account.db.AccountManagementException;
@@ -11,11 +14,16 @@ import org.opencb.opencga.account.db.AccountManager;
 import org.opencb.opencga.account.db.AccountMongoDBManager;
 import org.opencb.opencga.account.io.FileIOManager;
 import org.opencb.opencga.account.io.IOManagementException;
+import org.opencb.opencga.lib.auth.SqliteCredentials;
 import org.opencb.opencga.lib.common.Config;
 import org.opencb.opencga.lib.common.IOUtils;
 import org.opencb.opencga.lib.common.StringUtils;
+import org.opencb.opencga.storage.alignment.AlignmentQueryBuilder;
+import org.opencb.opencga.storage.alignment.TabixAlignmentQueryBuilder;
 import org.opencb.opencga.storage.datamanagers.VcfManager;
 import org.opencb.opencga.storage.datamanagers.bam.BamManager;
+import org.opencb.opencga.storage.variant.VariantQueryBuilder;
+import org.opencb.opencga.storage.variant.VariantSqliteQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,18 +34,6 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.regex.Pattern;
-
-import org.opencb.commons.bioformats.feature.Region;
-import org.opencb.commons.containers.QueryResult;
-import org.opencb.commons.containers.map.QueryOptions;
-import org.opencb.opencga.lib.auth.MonbaseCredentials;
-import org.opencb.opencga.lib.auth.SqliteCredentials;
-import org.opencb.opencga.storage.alignment.AlignmentQueryBuilder;
-import org.opencb.opencga.storage.alignment.TabixAlignmentQueryBuilder;
-import org.opencb.opencga.storage.variant.VariantMonbaseQueryBuilder;
-import org.opencb.opencga.storage.variant.VariantQueryBuilder;
-import org.opencb.opencga.storage.variant.VariantSqliteQueryBuilder;
-import sun.security.provider.SHA;
 
 public class CloudSessionManager {
 
@@ -207,6 +203,11 @@ public class CloudSessionManager {
     public void deleteAccount(String accountId, String sessionId) throws AccountManagementException,
             IOManagementException {
         // TODO
+    }
+
+
+    public boolean checkAccount(String accountId, String sessionId) {
+        return accountManager.checkAccount(accountId, sessionId);
     }
 
     /**

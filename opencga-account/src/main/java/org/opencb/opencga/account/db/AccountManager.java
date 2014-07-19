@@ -1,8 +1,6 @@
 package org.opencb.opencga.account.db;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.opencb.cellbase.core.lib.dbquery.QueryResult;
 import org.opencb.commons.containers.map.ObjectMap;
 import org.opencb.opencga.account.beans.*;
 
@@ -12,10 +10,13 @@ import java.util.List;
 
 public interface AccountManager {
 
+
     /**
      * Account methods ···
      * ***************************
      */
+    boolean checkAccount(String accountId, String sessionId);
+
     org.opencb.commons.containers.QueryResult<ObjectMap> createAccount(String accountId, String password, String accountName, String role, String email, Session session) throws AccountManagementException, JsonProcessingException;
 
     org.opencb.commons.containers.QueryResult<ObjectMap> deleteAccount(String accountId) throws AccountManagementException, JsonProcessingException;
