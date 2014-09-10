@@ -221,7 +221,10 @@ public class GenericWSServer {
 
     private String encryptResponse(Object obj){
         String encryptedMessage = "";
+
         try {
+            String jsonStr = jsonObjectWriter.writeValueAsString(obj);
+
             Properties prop = new Properties();
             prop.load(new InputStreamReader(getClass().getClassLoader().getResourceAsStream("aes.properties") ));
             String keyStoreFileLocation = getClass().getClassLoader().getResource("aes-keystore.jck").getFile();
@@ -231,10 +234,7 @@ public class GenericWSServer {
             String iv = prop.get("IV").toString();
 
             Key keyFromKeyStore = KeystoreUtil.getKeyFromKeyStore(keyStoreFileLocation, storePass, alias, keyPass);
-
             AESCipher cipherWithIv = new AESCipher(keyFromKeyStore, iv.getBytes());
-
-            String jsonStr = jsonObjectWriter.writeValueAsString(obj);
             encryptedMessage = cipherWithIv.getEncryptedMessage(jsonStr);
 
             //coll.add(encryptedMessage);
