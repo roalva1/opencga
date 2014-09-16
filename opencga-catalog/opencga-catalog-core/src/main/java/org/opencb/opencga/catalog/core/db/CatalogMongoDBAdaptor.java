@@ -181,7 +181,7 @@ public class CatalogMongoDBAdaptor implements CatalogDBAdaptor {
 
 
     /**
-     * User methods 
+     * User methods
      * ***************************
      */
 
