@@ -237,7 +237,6 @@ public class GenericWSServer {
             AESCipher cipherWithIv = new AESCipher(keyFromKeyStore, iv.getBytes());
             encryptedMessage = cipherWithIv.getEncryptedMessage(jsonStr);
 
-            //coll.add(encryptedMessage);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
