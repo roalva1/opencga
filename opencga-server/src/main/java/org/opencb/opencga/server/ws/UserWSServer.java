@@ -13,12 +13,12 @@ import java.io.IOException;
 
 @Path("/user/{userId}")
 public class UserWSServer extends GenericWSServer {
-    private String accountId;
+    private String userId;
 
     public UserWSServer(@Context UriInfo uriInfo, @Context HttpServletRequest httpServletRequest,
                         @DefaultValue("") @PathParam("userId") String userId) throws IOException, AccountManagementException {
         super(uriInfo, httpServletRequest);
-        this.accountId = userId;
+        this.userId = userId;
     }
 
 
@@ -29,10 +29,10 @@ public class UserWSServer extends GenericWSServer {
 
         QueryResult result;
         try {
-            if (accountId.toLowerCase().equals("anonymous")) {
-                result = cloudSessionManager.createAnonymousAccount(sessionIp);
+            if (userId.toLowerCase().equals("anonymous")) {
+                result = cloudSessionManager.createAnonymouAccount(sessionIp);
             } else {
-                result = cloudSessionManager.createAccount(accountId, password, name, email, sessionIp);
+                result = cloudSessionManager.createAccount(userId, password, name, email, sessionIp);
             }
             return createOkResponse(result);
         } catch (AccountManagementException | IOManagementException e) {
@@ -46,11 +46,11 @@ public class UserWSServer extends GenericWSServer {
     public Response login(@DefaultValue("") @QueryParam("password") String password) throws IOException {
         try {
             QueryResult result;
-            if (accountId.toLowerCase().equals("anonymous")) {
-                System.out.println("TEST ERROR accountId = " + accountId);
+            if (userId.toLowerCase().equals("anonymous")) {
+                System.out.println("TEST ERROR userId = " + userId);
                 result = cloudSessionManager.createAnonymousAccount(sessionIp);
             } else {
-                result = cloudSessionManager.login(accountId, password, sessionIp);
+                result = cloudSessionManager.login(userId, password, sessionIp);
             }
             return createOkResponse(result);
         } catch (AccountManagementException | IOManagementException e) {
@@ -64,10 +64,10 @@ public class UserWSServer extends GenericWSServer {
     public Response logout() throws IOException {
         try {
             QueryResult result;
-            if (accountId.toLowerCase().equals("anonymous")) {
+            if (userId.toLowerCase().equals("anonymous")) {
                 result = cloudSessionManager.logoutAnonymous(sessionId);
             } else {
-                result = cloudSessionManager.logout(accountId, sessionId);
+                result = cloudSessionManager.logout(userId, sessionId);
             }
             return createOkResponse(result);
         } catch (AccountManagementException | IOManagementException e) {
@@ -80,10 +80,10 @@ public class UserWSServer extends GenericWSServer {
     @Path("/info")
     public Response getInfoAccount(@DefaultValue("") @QueryParam("last_activity") String lastActivity) {
         try {
-            QueryResult result = cloudSessionManager.getAccountInfo(accountId, lastActivity, sessionId);
+            QueryResult result = cloudSessionManager.getAccountInfo(userId, lastActivity, sessionId);
             return createOkResponse(result);
         } catch (AccountManagementException e) {
-            logger.error(accountId);
+            logger.error(userId);
             logger.error(e.toString());
             return createErrorResponse("could not get account information");
         }
@@ -93,7 +93,7 @@ public class UserWSServer extends GenericWSServer {
     // @Path("/delete/")
     // public Response deleteAccount() {
     // try {
-    // cloudSessionManager.deleteAccount(accountId, sessionId);
+    // cloudSessionManager.deleteAccount(userId, sessionId);
     // return createOkResponse("OK");
     // } catch (AccountManagementException e) {
     // logger.error(e.toString());
@@ -104,18 +104,18 @@ public class UserWSServer extends GenericWSServer {
     // OLD
 
     // @GET
-    // @Path("/pipetest/{accountId}/{password}") //Pruebas
-    // public Response pipeTest(@PathParam("accountId") String
-    // accountId,@PathParam("password") String password){
-    // return createOkResponse(userManager.testPipe(accountId, password));
+    // @Path("/pipetest/{userId}/{password}") //Pruebas
+    // public Response pipeTest(@PathParam("userId") String
+    // userId,@PathParam("password") String password){
+    // return createOkResponse(userManager.testPipe(userId, password));
     // }
 
     // @GET
     // @Path("/getuserbyaccountid")
     // public Response getUserByAccountId(@QueryParam("accountid") String
-    // accountId,
+    // userId,
     // @QueryParam("sessionid") String sessionId) {
-    // return createOkResponse(userManager.getUserByAccountId(accountId,
+    // return createOkResponse(userManager.getUserByAccountId(userId,
     // sessionId));
     // }
     //
@@ -127,19 +127,19 @@ public class UserWSServer extends GenericWSServer {
     // }
 
     // @GET
-    // @Path("/{accountId}/createproject")
-    // public Response createProject(@PathParam("accountId") String accountId,
+    // @Path("/{userId}/createproject")
+    // public Response createProject(@PathParam("userId") String userId,
     // @QueryParam("project") Project project, @QueryParam("sessionId") String
     // sessionId){
-    // return createOkResponse(userManager.createProject(project, accountId,
+    // return createOkResponse(userManager.createProject(project, userId,
     // sessionId));
     // }
 
     // @GET
-    // @Path("/createproject/{accountId}/{password}/{accountName}/{email}")
+    // @Path("/createproject/{userId}/{password}/{accountName}/{email}")
     // public Response register(@Context HttpServletRequest
-    // httpServletRequest,@PathParam("accountId") String
-    // accountId,@PathParam("password") String
+    // httpServletRequest,@PathParam("userId") String
+    // userId,@PathParam("password") String
     // password,@PathParam("accountName") String accountName,
     // @PathParam("email") String email){
     // String IPaddr = httpServletRequest.getRemoteAddr().toString();
@@ -151,7 +151,7 @@ public class UserWSServer extends GenericWSServer {
     // Session session = new Session(IPaddr);
     //
     // try {
-    // userManager.createUser(accountId,password,accountName,email,session);
+    // userManager.createUser(userId,password,accountName,email,session);
     // } catch (AccountManagementException e) {
     // return createErrorResponse(e.toString());
     // }
