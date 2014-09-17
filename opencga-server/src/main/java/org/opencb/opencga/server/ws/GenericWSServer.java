@@ -13,7 +13,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.*;
 
-import com.sun.org.apache.xml.internal.resolver.CatalogManager;
+//import com.sun.org.apache.xml.internal.resolver.CatalogManager;
 import org.opencb.commons.containers.QueryResponse;
 import org.opencb.commons.containers.QueryResult;
 import org.opencb.commons.containers.map.ObjectMap;
@@ -60,11 +60,11 @@ public class GenericWSServer {
     /**
      * Only one CloudSessionManager
      */
-    protected static CatalogManager cloudSessionManager;
+    protected static CloudSessionManager cloudSessionManager;
 
     static {
         try {
-            cloudSessionManager = new CatalogManager();
+            cloudSessionManager = new CloudSessionManager();
         } catch (Exception e) {
             e.printStackTrace();
         }
