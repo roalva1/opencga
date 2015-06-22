@@ -280,14 +280,16 @@ public class AnalysisJobExecutor {
         return jobQueryResult;
     }
 
-    private static QueryResult<Job> executeLocal(CatalogManager catalogManager, Job job, String sessionId) throws CatalogException {
+    private static QueryResult<Job> executeLocal(CatalogManager catalogManager, Job job, String sessionId) throws CatalogException, IOException {
         logger.info("==========================================");
         logger.info("Executing job {}({})", job.getName(), job.getId());
         logger.debug("Executing commandLine {}", job.getCommandLine());
         logger.info("==========================================");
         System.err.println();
 
-        Command com = new Command(job.getCommandLine());
+        String commandLine = job.getTmpOutDirUri()+"/command_line.sh";
+        Files.write(Paths.get(commandLine), job.getCommandLine().getBytes());
+        Command com = new Command(commandLine);
         com.run();
 
         System.err.println();
